@@ -14,9 +14,8 @@ var mongoose = require('mongoose');
 var configDB = require('./config/db.js');
 mongoose.connect(configDB.url);
 
-require('./config/passport')(passport);
-
 var routes = require('./routes/index');
+var users = require('./routes/users');
 
 var app = express();
 
@@ -38,10 +37,6 @@ app.use(session({
   saveUninitialized: true,
   resave: true
 }));
-
-// Passport init
-app.use(passport.initialize());
-app.use(passport.session());
 
 app.use(require('connect-flash')());
 app.use(function (req, res, next) {
@@ -66,16 +61,8 @@ app.use(expressValidator({
   }
 }));
 
-// Global Vars
-app.use(function(req, res, next){
-  if(req.user){
-    res.locals.username = req.user.username;
-  }
-
-  next();
-});
-
 app.use('/', routes);
+app.use('/users', users);
 
 // catch 404 and forward to error handler
 app.use(function(req, res, next) {
